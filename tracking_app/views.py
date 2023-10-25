@@ -18,7 +18,11 @@ def extract_tracking_numbers(html_content, button_name):
         return []
 
 
+# 添加一个全局变量
+last_tracking_numbers = []
+
 def index(request):
+    global last_tracking_numbers  # 声明你要使用全局变量
     trackform = TrackingForm()
 
     tracking_numbers = []  # 初始化空列表，用于存储追踪号码
@@ -34,6 +38,7 @@ def index(request):
             html_content = html_content_1 + '<br>' + html_content_2 + '<br>' + html_content_3
 
             tracking_numbers = extract_tracking_numbers(html_content, button_name)
+            last_tracking_numbers = tracking_numbers  # 更新全局变量的值
 
             if button_name == 'UPS':
                 # 在这里执行UPS运单跟踪逻辑
@@ -44,5 +49,8 @@ def index(request):
             elif button_name == 'DHL':
                 # 在这里执行DHL运单跟踪逻辑
                 pass
+    else:  # GET请求
+        tracking_numbers = last_tracking_numbers  # 使用上一次的运单号渲染页面
 
     return render(request, 'index.html', {"trackform": trackform, "tracking_numbers": tracking_numbers})
+
